@@ -77,14 +77,10 @@ jobs:
           gh release delete "nightly" --yes --repo "$GITHUB_REPOSITORY" 2>/dev/null || true
           gh release delete-tag "nightly" --yes --repo "$GITHUB_REPOSITORY" 2>/dev/null || true
           # Create new nightly release with APKs
+          NOTES="Automatically built from the latest commit on ${GITHUB_REF#refs/heads/}. Commit: $GITHUB_SHA. Both APKs are installable (signed with debug key)."
           gh release create "nightly" \
             app/build/outputs/apk/debug/*.apk \
             app/build/outputs/apk/release/*.apk \
             --title "ZBProxy Android (Nightly Build)" \
-            --notes "Automatically built from the latest commit on $(echo ${GITHUB_REF#refs/heads/}).
-
-Commit: $GITHUB_SHA
-
-> **ZBProxy-v3.1.0-debug.apk** - 可直接安装
-> **ZBProxy-v3.1.0-release-unsigned.apk** - release 构建（debug 签名）" \
+            --notes "$NOTES" \
             --repo "$GITHUB_REPOSITORY"
