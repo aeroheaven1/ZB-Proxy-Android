@@ -104,16 +104,13 @@ class TcpRelay(
         val tIn = targetIn ?: targetSocket!!.getInputStream()
         val tOut = targetOut ?: targetSocket!!.getOutputStream()
 
-        val job1 = scope.launch(Dispatchers.IO) {
-            relay(cIn, tOut, "C->T")
-        }
-        val job2 = scope.launch(Dispatchers.IO) {
-            relay(tIn, cOut, "T->C")
-        }
-
-        runBlocking {
-            job1.join()
-            job2.join()
+        coroutineScope {
+            launch(Dispatchers.IO) {
+                relay(cIn, tOut, "C->T")
+            }
+            launch(Dispatchers.IO) {
+                relay(tIn, cOut, "T->C")
+            }
         }
     }
 
