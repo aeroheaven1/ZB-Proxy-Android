@@ -54,8 +54,6 @@
     <string name="svc_rewrite_hostname">重寫主機名</string>
     <string name="svc_motd_description">MOTD 描述（伺服器列表）</string>
     <string name="svc_motd_hint">支援 § 顏色代碼、\\n 換行，以及 {NAME} {HOST} {PORT} {INFO} 佔位符</string>
-    <string name="svc_scoreboard">側邊計分板（遊戲內）</string>
-    <string name="svc_scoreboard_hint">每行一條目，第一行為標題。支援 § 顏色代碼。留空則停用</string>
     <string name="svc_minecraft">Minecraft</string>
     <string name="svc_minecraft_rewrite">Minecraft 重寫</string>
     <string name="svc_listen">監聽</string>

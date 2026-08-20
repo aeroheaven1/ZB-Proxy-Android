@@ -78,7 +78,6 @@ class ProxyServer private constructor(
                 val minecraftRewrite: String?
                 val minecraftPort: Int?
                 var motdDescription: String? = null
-                var scoreboardLines: List<String>? = null
 
                 // Check if there's a matching outbound with Minecraft rewrite
                 val matchingRule = configManager.config.value.router.rules.find { rule ->
@@ -110,14 +109,12 @@ class ProxyServer private constructor(
                     minecraftRewrite = minecraftRewriteConfig.hostname
                     minecraftPort = minecraftRewriteConfig.port
                     motdDescription = outbound?.minecraft?.motdDescription
-                    scoreboardLines = outbound?.minecraft?.scoreboardLines
                 } else if (serviceConfig.targetAddress.isNotEmpty()) {
                     targetAddress = serviceConfig.targetAddress
                     targetPort = serviceConfig.targetPort
                     minecraftRewrite = serviceConfig.minecraft?.rewrittenHostname
                     minecraftPort = serviceConfig.targetPort
                     motdDescription = serviceConfig.minecraft?.motdDescription
-                    scoreboardLines = serviceConfig.minecraft?.scoreboardLines
                 } else {
                     // Find first matching outbound
                     val outbound = configManager.config.value.outbounds.firstOrNull()
@@ -126,7 +123,6 @@ class ProxyServer private constructor(
                     minecraftRewrite = outbound?.minecraft?.rewrittenHostname
                     minecraftPort = outbound?.targetPort ?: 25565
                     motdDescription = outbound?.minecraft?.motdDescription
-                    scoreboardLines = outbound?.minecraft?.scoreboardLines
                 }
 
                 // Accept connections
@@ -138,8 +134,7 @@ class ProxyServer private constructor(
                         targetPort,
                         minecraftRewrite,
                         minecraftPort,
-                        motdDescription,
-                        scoreboardLines
+                        motdDescription
                     )
                 }
             } catch (e: Exception) {
@@ -157,8 +152,7 @@ class ProxyServer private constructor(
         targetPort: Int,
         minecraftRewrite: String?,
         minecraftPort: Int?,
-        motdDescription: String?,
-        scoreboardLines: List<String>?
+        motdDescription: String?
     ) {
         while (isRunning.get() && !serverSocket.isClosed) {
             try {
@@ -182,7 +176,6 @@ class ProxyServer private constructor(
                     minecraftHostnameRewrite = minecraftRewrite,
                     minecraftPortRewrite = minecraftPort,
                     motdDescription = motdDescription,
-                    scoreboardLines = scoreboardLines,
                     logCollector = logCollector,
                     connectionId = connId,
                     scope = scope

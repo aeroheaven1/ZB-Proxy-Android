@@ -54,8 +54,6 @@
     <string name="svc_rewrite_hostname">Rewrite Hostname</string>
     <string name="svc_motd_description">MOTD Description (server list)</string>
     <string name="svc_motd_hint">Supports § color codes, \\n for line breaks, and {NAME} {HOST} {PORT} {INFO} placeholders</string>
-    <string name="svc_scoreboard">Sidebar Scoreboard (in-game)</string>
-    <string name="svc_scoreboard_hint">One line per entry. First line = title. Supports § color codes. Empty = disabled</string>
     <string name="svc_minecraft">Minecraft</string>
     <string name="svc_minecraft_rewrite">Minecraft rewrite</string>
     <string name="svc_listen">Listen</string>

@@ -45,8 +45,7 @@ data class MinecraftServiceConfig(
     @SerializedName("NameAccess") var nameAccess: AccessConfig? = null,
     @SerializedName("PingMode") var pingMode: String = "",
     @SerializedName("MotdFavicon") var motdFavicon: String = "{DEFAULT_MOTD}",
-    @SerializedName("MotdDescription") var motdDescription: String = "§d{NAME}§e, provided by §a§o{INFO}§r\\n§c§lProxy for §6§n{HOST}:{PORT}§r",
-    @SerializedName("ScoreboardLines") var scoreboardLines: List<String> = emptyList()
+    @SerializedName("MotdDescription") var motdDescription: String = "§d{NAME}§e, provided by §a§o{INFO}§r\\n§c§lProxy for §6§n{HOST}:{PORT}§r"
 )
 
 data class OnlineCountConfig(

@@ -54,8 +54,6 @@
     <string name="svc_rewrite_hostname">ホスト名を書き換え</string>
     <string name="svc_motd_description">MOTD 説明（サーバーリスト）</string>
     <string name="svc_motd_hint">§ カラーコード、\\n 改行、{NAME} {HOST} {PORT} {INFO} プレースホルダーに対応</string>
-    <string name="svc_scoreboard">サイドバースコアボード（ゲーム内）</string>
-    <string name="svc_scoreboard_hint">各行が1エントリ、1行目はタイトル。§ カラーコード対応。空欄で無効</string>
     <string name="svc_minecraft">Minecraft</string>
     <string name="svc_minecraft_rewrite">Minecraft 書き換え</string>
     <string name="svc_listen">リッスン</string>
