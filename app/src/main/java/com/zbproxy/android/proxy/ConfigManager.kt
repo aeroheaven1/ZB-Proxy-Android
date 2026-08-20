@@ -103,36 +103,42 @@ class ConfigManager(private val context: Context) {
 
     suspend fun updateService(service: ServiceConfig) {
         val current = _config.value
-        val index = current.services.indexOfFirst { it.name == service.name }
+        // Create a NEW RootConfig instance so StateFlow emits an update
+        val newServices = current.services.toMutableList()
+        val index = newServices.indexOfFirst { it.name == service.name }
         if (index >= 0) {
-            current.services[index] = service
+            newServices[index] = service
         } else {
-            current.services.add(service)
+            newServices.add(service)
         }
-        saveConfig(current)
+        saveConfig(current.copy(services = newServices))
     }
 
     suspend fun updateOutbound(outbound: OutboundConfig) {
         val current = _config.value
-        val index = current.outbounds.indexOfFirst { it.name == outbound.name }
+        // Create a NEW RootConfig instance so StateFlow emits an update
+        val newOutbounds = current.outbounds.toMutableList()
+        val index = newOutbounds.indexOfFirst { it.name == outbound.name }
         if (index >= 0) {
-            current.outbounds[index] = outbound
+            newOutbounds[index] = outbound
         } else {
-            current.outbounds.add(outbound)
+            newOutbounds.add(outbound)
         }
-        saveConfig(current)
+        saveConfig(current.copy(outbounds = newOutbounds))
     }
 
     suspend fun deleteService(name: String) {
         val current = _config.value
-        current.services.removeAll { it.name == name }
-        saveConfig(current)
+        saveConfig(
+            current.copy(services = current.services.filterNot { it.name == name })
+        )
     }
 
     suspend fun deleteOutbound(name: String) {
         val current = _config.value
-        current.outbounds.removeAll { it.name == name }
-        saveConfig(current)
+        saveConfig(
+            current.copy(outbounds = current.outbounds.filterNot { it.name == name })
+        )
     }
 
     fun getServiceConfig(name: String): ServiceConfig? {

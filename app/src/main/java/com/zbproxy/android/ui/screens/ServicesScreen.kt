@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.zbproxy.android.R
 import com.zbproxy.android.proxy.*
@@ -190,13 +191,17 @@ fun ServiceConfigCard(
             Text(
                 stringResource(R.string.svc_listen) + ": 0.0.0.0:${service.listen}",
                 style = MaterialTheme.typography.bodySmall,
-                fontFamily = FontFamily.Monospace
+                fontFamily = FontFamily.Monospace,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             if (service.targetAddress.isNotEmpty()) {
                 Text(
                     stringResource(R.string.svc_target) + ": ${service.targetAddress}:${service.targetPort}",
                     style = MaterialTheme.typography.bodySmall,
-                    fontFamily = FontFamily.Monospace
+                    fontFamily = FontFamily.Monospace,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
             val mc = service.minecraft
@@ -210,7 +215,9 @@ fun ServiceConfigCard(
                         stringResource(R.string.svc_minecraft) + ": ${mc.rewrittenHostname}",
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                        color = MaterialTheme.colorScheme.onTertiaryContainer,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
@@ -256,7 +263,9 @@ fun OutboundConfigCard(
             Text(
                 stringResource(R.string.svc_target) + ": ${outbound.targetAddress}:${outbound.targetPort}",
                 style = MaterialTheme.typography.bodySmall,
-                fontFamily = FontFamily.Monospace
+                fontFamily = FontFamily.Monospace,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             val mc = outbound.minecraft
             if (mc != null) {
@@ -269,7 +278,9 @@ fun OutboundConfigCard(
                         stringResource(R.string.svc_minecraft_rewrite) + ": ${mc.rewrittenHostname}",
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                        color = MaterialTheme.colorScheme.onTertiaryContainer,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
@@ -318,7 +329,7 @@ fun ServiceEditDialog(
                 )
                 OutlinedTextField(
                     value = targetAddress,
-                    onValueChange = { targetAddress = it },
+                    onValueChange = { targetAddress = it.replace("\n", "").replace("\r", "") },
                     label = { Text(stringResource(R.string.svc_target_address)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
@@ -345,7 +356,7 @@ fun ServiceEditDialog(
                 if (enableMinecraft) {
                     OutlinedTextField(
                         value = rewriteHostname,
-                        onValueChange = { rewriteHostname = it },
+                        onValueChange = { rewriteHostname = it.replace("\n", "").replace("\r", "") },
                         label = { Text(stringResource(R.string.svc_rewrite_hostname)) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
@@ -356,13 +367,13 @@ fun ServiceEditDialog(
         confirmButton = {
             TextButton(onClick = {
                 onSave(service.copy(
-                    name = name,
+                    name = name.replace("\n", "").replace("\r", ""),
                     listen = listen.toIntOrNull() ?: 25565,
-                    targetAddress = targetAddress,
+                    targetAddress = targetAddress.replace("\n", "").replace("\r", ""),
                     targetPort = targetPort.toIntOrNull() ?: 25565,
                     minecraft = if (enableMinecraft) MinecraftServiceConfig(
                         enableHostnameRewrite = true,
-                        rewrittenHostname = rewriteHostname
+                        rewrittenHostname = rewriteHostname.replace("\n", "").replace("\r", "")
                     ) else null
                 ))
             }) {
@@ -409,7 +420,7 @@ fun OutboundEditDialog(
                 )
                 OutlinedTextField(
                     value = targetAddress,
-                    onValueChange = { targetAddress = it },
+                    onValueChange = { targetAddress = it.replace("\n", "").replace("\r", "") },
                     label = { Text(stringResource(R.string.svc_target_address)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
@@ -436,7 +447,7 @@ fun OutboundEditDialog(
                 if (enableMinecraft) {
                     OutlinedTextField(
                         value = rewriteHostname,
-                        onValueChange = { rewriteHostname = it },
+                        onValueChange = { rewriteHostname = it.replace("\n", "").replace("\r", "") },
                         label = { Text(stringResource(R.string.svc_rewrite_hostname)) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
@@ -447,12 +458,12 @@ fun OutboundEditDialog(
         confirmButton = {
             TextButton(onClick = {
                 onSave(outbound.copy(
-                    name = name,
-                    targetAddress = targetAddress,
+                    name = name.replace("\n", "").replace("\r", ""),
+                    targetAddress = targetAddress.replace("\n", "").replace("\r", ""),
                     targetPort = targetPort.toIntOrNull() ?: 25565,
                     minecraft = if (enableMinecraft) MinecraftServiceConfig(
                         enableHostnameRewrite = true,
-                        rewrittenHostname = rewriteHostname
+                        rewrittenHostname = rewriteHostname.replace("\n", "").replace("\r", "")
                     ) else null
                 ))
             }) {
