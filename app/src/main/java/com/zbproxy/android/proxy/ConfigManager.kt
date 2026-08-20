@@ -80,20 +80,24 @@ class ConfigManager(private val context: Context) {
             ),
             lists = mutableMapOf()
         )
-        saveConfig(config)
+        writeConfigToFile(config)
         return config
+    }
+
+    private fun writeConfigToFile(newConfig: RootConfig) {
+        try {
+            val json = gson.toJson(newConfig)
+            configFile.writeText(json)
+            _config.value = newConfig
+            Log.i(TAG, "Config saved successfully")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to save config", e)
+        }
     }
 
     suspend fun saveConfig(newConfig: RootConfig) {
         withContext(Dispatchers.IO) {
-            try {
-                val json = gson.toJson(newConfig)
-                configFile.writeText(json)
-                _config.value = newConfig
-                Log.i(TAG, "Config saved successfully")
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to save config", e)
-            }
+            writeConfigToFile(newConfig)
         }
     }
 

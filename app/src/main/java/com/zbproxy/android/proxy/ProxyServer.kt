@@ -95,8 +95,9 @@ class ProxyServer(
                     }
                 }
 
-                if (matchingRule?.rewrite?.minecraft != null) {
-                    val rewrite = matchingRule.rewrite.minecraft!!
+                val ruleRewrite = matchingRule?.rewrite
+                if (ruleRewrite?.minecraft != null) {
+                    val rewrite = ruleRewrite.minecraft
                     val outbound = configManager.config.value.outbounds.find { it.name == matchingRule.outbound }
                     targetAddress = outbound?.targetAddress ?: rewrite.hostname
                     targetPort = rewrite.port

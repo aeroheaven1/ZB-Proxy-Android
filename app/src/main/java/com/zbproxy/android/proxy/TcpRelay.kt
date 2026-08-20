@@ -51,7 +51,7 @@ class TcpRelay(
         }
     }
 
-    private fun handleMinecraftRewriting() {
+    private suspend fun handleMinecraftRewriting() {
         try {
             val clientIn = BufferedInputStream(clientSocket.getInputStream())
             val clientOut = BufferedOutputStream(clientSocket.getOutputStream())
@@ -93,7 +93,7 @@ class TcpRelay(
         }
     }
 
-    private fun startBidirectionalRelay(
+    private suspend fun startBidirectionalRelay(
         clientIn: java.io.InputStream? = null,
         clientOut: java.io.OutputStream? = null,
         targetIn: java.io.InputStream? = null,

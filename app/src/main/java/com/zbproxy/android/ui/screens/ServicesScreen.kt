@@ -195,14 +195,15 @@ fun ServiceConfigCard(
                     fontFamily = FontFamily.Monospace
                 )
             }
-            if (service.minecraft != null) {
+            val mc = service.minecraft
+            if (mc != null) {
                 Surface(
                     shape = MaterialTheme.shapes.small,
                     color = MaterialTheme.colorScheme.tertiaryContainer,
                     modifier = Modifier.padding(top = 8.dp)
                 ) {
                     Text(
-                        "Minecraft: ${service.minecraft.rewrittenHostname}",
+                        "Minecraft: ${mc.rewrittenHostname}",
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onTertiaryContainer
@@ -253,14 +254,15 @@ fun OutboundConfigCard(
                 style = MaterialTheme.typography.bodySmall,
                 fontFamily = FontFamily.Monospace
             )
-            if (outbound.minecraft != null) {
+            val mc = outbound.minecraft
+            if (mc != null) {
                 Surface(
                     shape = MaterialTheme.shapes.small,
                     color = MaterialTheme.colorScheme.tertiaryContainer,
                     modifier = Modifier.padding(top = 8.dp)
                 ) {
                     Text(
-                        "Minecraft rewrite: ${outbound.minecraft.rewrittenHostname}",
+                        "Minecraft rewrite: ${mc.rewrittenHostname}",
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onTertiaryContainer

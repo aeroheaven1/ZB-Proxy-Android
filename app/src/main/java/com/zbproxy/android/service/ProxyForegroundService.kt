@@ -28,7 +28,7 @@ class ProxyForegroundService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_START -> startProxy()
-            ACTION_STOP -> stopProxy()
+            ACTION_STOP -> serviceScope.launch { stopProxy() }
             else -> startProxy()
         }
         return START_STICKY
