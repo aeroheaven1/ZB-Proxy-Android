@@ -4,6 +4,7 @@ import com.zbproxy.android.util.LogCollector
 import kotlinx.coroutines.*
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
+import java.io.ByteArrayOutputStream
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.net.SocketException
@@ -157,11 +158,16 @@ class TcpRelay(
     /**
      * Minecraft login flow with sidebar scoreboard injection.
      *
-     * For 1.20.2+ (protocol >= 763) the client enters a Configuration phase after
-     * Login Success, so we must wait for the clientbound Finish Configuration
-     * (packet 0x02 in configuration state) before injecting the scoreboard.
-     *
-     * For older versions, inject right after Login Success + first client packet.
+     * Safety-first design:
+     *  - If the server uses encryption (Online Mode) or packet compression,
+     *    scoreboard injection is skipped and the connection relays normally
+     *    so the player can always join.
+     *  - For 1.20.2+ (protocol >= 764) the client enters a Configuration phase
+     *    after Login Success. Configuration is bidirectional, so we keep
+     *    forwarding both directions concurrently and detect the clientbound
+     *    Finish Configuration packet (0x02 for 1.20.2-1.20.4, 0x03 for 1.20.5+)
+     *    in the server->client stream, then inject.
+     *  - For older versions, inject right after Login Success + first client packet.
      */
     private suspend fun handleLoginWithScoreboard(
         clientIn: java.io.InputStream,
@@ -170,69 +176,227 @@ class TcpRelay(
         targetOut: java.io.OutputStream,
         handshake: MinecraftProtocol.HandshakeData
     ) {
+        val originalTimeout = clientSocket.soTimeout
         try {
             // Give the client socket a short read timeout so we don't block forever
-            val originalTimeout = clientSocket.soTimeout
             clientSocket.soTimeout = 5000
 
-            // 1. Read server -> client packets until Login Success (0x02)
+            // 1. Read server -> client packets until Login Success (0x02).
+            //    Watch for Encryption Request (0x01) and Set Compression (0x03).
             var loginSuccessSeen = false
+            var encrypted = false
+            var compressed = false
             var readCount = 0
             while (!loginSuccessSeen && readCount < 30) {
                 val packet = MinecraftProtocol.readPacket(targetIn) ?: break
                 readCount++
                 forwardPacket(clientOut, packet)
 
-                if (packet.isNotEmpty() && packet[0].toInt() and 0xFF == 0x02) {
-                    loginSuccessSeen = true
-                    logCollector.info("Relay",
-                        "[$connectionId] Login success detected (protocol ${handshake.protocolVersion})")
+                if (packet.isNotEmpty()) {
+                    when (packet[0].toInt() and 0xFF) {
+                        0x01 -> { // Encryption Request (login) - cannot decrypt
+                            encrypted = true
+                            logCollector.warn("Relay",
+                                "[$connectionId] Server uses encryption, scoreboard injection disabled")
+                        }
+                        0x03 -> { // Set Compression (login)
+                            val threshold = parseVarInt(packet, 1)
+                            if (threshold != null && threshold > 0) {
+                                compressed = true
+                                logCollector.warn("Relay",
+                                    "[$connectionId] Server uses compression, scoreboard injection disabled")
+                            }
+                        }
+                        0x02 -> { // Login Success
+                            loginSuccessSeen = true
+                            logCollector.info("Relay",
+                                "[$connectionId] Login success detected (protocol ${handshake.protocolVersion})")
+                        }
+                    }
                 }
             }
 
-            if (loginSuccessSeen) {
+            if (!encrypted && !compressed && loginSuccessSeen) {
                 if (handshake.protocolVersion >= 764) {
-                    // 1.20.2+: forward Login Acknowledged, then wait for Configuration finish
-                    val loginAck = MinecraftProtocol.readPacket(clientIn)
-                    if (loginAck != null) forwardPacket(targetOut, loginAck)
-
-                    logCollector.debug("Relay",
-                        "[$connectionId] Waiting for configuration finish...")
-                    var configDone = false
-                    var configReads = 0
-                    while (!configDone && configReads < 100) {
-                        val packet = MinecraftProtocol.readPacket(targetIn) ?: break
-                        configReads++
-                        forwardPacket(clientOut, packet)
-                        // Clientbound configuration Finish Configuration = 0x02
-                        if (packet.isNotEmpty() && packet[0].toInt() and 0xFF == 0x02) {
-                            configDone = true
-                            logCollector.info("Relay",
-                                "[$connectionId] Configuration finished, injecting scoreboard")
-                        }
-                    }
-                    if (configDone) {
-                        injectScoreboard(clientOut, handshake.protocolVersion)
-                    } else {
-                        logCollector.warn("Relay",
-                            "[$connectionId] Configuration did not finish, scoreboard skipped")
-                    }
+                    // Restore timeout before long-lived relay so idle connections don't drop
+                    clientSocket.soTimeout = originalTimeout
+                    // 1.20.2+: concurrent bidirectional forwarding with config-finish detection
+                    // Blocks until the connection closes, so return afterwards.
+                    relayWithConfigDetection(clientIn, clientOut, targetIn, targetOut, handshake.protocolVersion)
+                    return
                 } else {
-                    // Older versions: forward one client packet, then inject
+                    // Older versions: forward one client packet, then inject.
+                    // Keep the short timeout; if no packet arrives, skip injection safely.
                     val clientPacket = MinecraftProtocol.readPacket(clientIn)
                     if (clientPacket != null) forwardPacket(targetOut, clientPacket)
                     injectScoreboard(clientOut, handshake.protocolVersion)
                 }
+            } else if (!loginSuccessSeen) {
+                logCollector.warn("Relay",
+                    "[$connectionId] Login success not detected, scoreboard skipped")
             }
 
-            // Restore timeout and continue relay
+            // Restore timeout (in case we skipped the branch above) and continue relay
             clientSocket.soTimeout = originalTimeout
             startBidirectionalRelay(clientIn, clientOut, targetIn, targetOut)
         } catch (e: Exception) {
             logCollector.debug("Relay",
                 "[$connectionId] Login scoreboard flow error: ${e.message}")
+            clientSocket.soTimeout = originalTimeout
             startBidirectionalRelay(clientIn, clientOut, targetIn, targetOut)
         }
+    }
+
+    /**
+     * For 1.20.2+: forward both directions concurrently.
+     * The server->client direction parses packets and injects the scoreboard
+     * once the clientbound Finish Configuration packet is seen.
+     */
+    private suspend fun relayWithConfigDetection(
+        clientIn: java.io.InputStream,
+        clientOut: java.io.OutputStream,
+        targetIn: java.io.InputStream,
+        targetOut: java.io.OutputStream,
+        protocolVersion: Int
+    ) {
+        // Finish Configuration packet id in configuration state:
+        // 1.20.2-1.20.4 = 0x02, 1.20.5+ = 0x03
+        val finishConfigId = if (protocolVersion >= 766) 0x03 else 0x02
+        logCollector.debug("Relay",
+            "[$connectionId] Configuration phase active, waiting for Finish Configuration (0x${finishConfigId.toString(16)})")
+
+        coroutineScope {
+            launch(Dispatchers.IO) {
+                relay(clientIn, targetOut, "C->T")
+            }
+            launch(Dispatchers.IO) {
+                relayTtoCWithInjection(targetIn, clientOut, finishConfigId, protocolVersion)
+            }
+        }
+    }
+
+    /**
+     * Server->client relay that parses individual packets so we can detect
+     * the Finish Configuration packet and inject the scoreboard at the right
+     * moment, without blocking the client->server direction.
+     */
+    private suspend fun relayTtoCWithInjection(
+        targetIn: java.io.InputStream,
+        clientOut: java.io.OutputStream,
+        finishConfigId: Int,
+        protocolVersion: Int
+    ) {
+        val temp = ByteArray(8192)
+        val buffer = ByteArrayOutputStream()
+        var injected = false
+        var totalBytes = 0L
+        try {
+            while (isRunning.get()) {
+                val n = withContext(Dispatchers.IO) {
+                    targetIn.read(temp)
+                }
+                if (n == -1) break
+                buffer.write(temp, 0, n)
+                totalBytes += n
+
+                val bytes = buffer.toByteArray()
+                var consumed = 0
+                while (consumed < bytes.size) {
+                    val packetInfo = tryReadPacket(bytes, consumed) ?: break
+                    // Forward this packet
+                    withContext(Dispatchers.IO) {
+                        clientOut.write(bytes, consumed, packetInfo.varintLen + packetInfo.packetLen)
+                        clientOut.flush()
+                    }
+                    // Inject after Finish Configuration
+                    if (!injected && packetInfo.packet.isNotEmpty() &&
+                        (packetInfo.packet[0].toInt() and 0xFF) == finishConfigId
+                    ) {
+                        injected = true
+                        logCollector.info("Relay",
+                            "[$connectionId] Configuration finished, injecting scoreboard")
+                        injectScoreboard(clientOut, protocolVersion)
+                        // Flush remaining buffered bytes, then switch to raw relay
+                        if (consumed + packetInfo.varintLen + packetInfo.packetLen < bytes.size) {
+                            val rest = bytes.copyOfRange(
+                                consumed + packetInfo.varintLen + packetInfo.packetLen, bytes.size)
+                            withContext(Dispatchers.IO) {
+                                clientOut.write(rest)
+                                clientOut.flush()
+                            }
+                        }
+                        relay(targetIn, clientOut, "T->C")
+                        return
+                    }
+                    consumed += packetInfo.varintLen + packetInfo.packetLen
+                }
+
+                // Drop consumed bytes from buffer
+                if (consumed > 0) {
+                    val remaining = bytes.copyOfRange(consumed, bytes.size)
+                    buffer.reset()
+                    if (remaining.isNotEmpty()) buffer.write(remaining)
+                }
+            }
+        } catch (e: SocketException) {
+            // Connection closed, normal
+        } catch (e: Exception) {
+            logCollector.debug("Relay",
+                "[$connectionId] T->C relay error: ${e.message}")
+        } finally {
+            logCollector.debug("Relay",
+                "[$connectionId] T->C relay ended, transferred $totalBytes bytes")
+        }
+    }
+
+    /**
+     * Try to parse one complete Minecraft packet (VarInt length + payload)
+     * from a byte array starting at [offset]. Returns null if incomplete.
+     */
+    private fun tryReadPacket(data: ByteArray, offset: Int): PacketInfo? {
+        // Read VarInt length
+        var value = 0
+        var shift = 0
+        var current = offset
+        var varintLen = 0
+        while (true) {
+            if (current >= data.size) return null // incomplete varint
+            val b = data[current].toInt() and 0xFF
+            value = value or ((b and 0x7F) shl shift)
+            current++
+            varintLen++
+            if ((b and 0x80) == 0) break
+            shift += 7
+            if (shift > 35) return null
+        }
+        if (value <= 0 || value > 32767) return null
+        if (offset + varintLen + value > data.size) return null // incomplete payload
+
+        val packet = data.copyOfRange(offset + varintLen, offset + varintLen + value)
+        return PacketInfo(varintLen, value, packet)
+    }
+
+    private data class PacketInfo(val varintLen: Int, val packetLen: Int, val packet: ByteArray)
+
+    /**
+     * Parse a VarInt from a packet payload at the given offset.
+     * Returns null if parsing fails.
+     */
+    private fun parseVarInt(data: ByteArray, offset: Int): Int? {
+        if (offset >= data.size) return null
+        var value = 0
+        var shift = 0
+        var current = offset
+        while (true) {
+            if (current >= data.size) return null
+            val b = data[current].toInt() and 0xFF
+            value = value or ((b and 0x7F) shl shift)
+            current++
+            if ((b and 0x80) == 0) break
+            shift += 7
+            if (shift > 35) return null
+        }
+        return value
     }
 
     private fun forwardPacket(output: java.io.OutputStream, packet: ByteArray) {
