@@ -130,14 +130,14 @@ class ConfigManager(private val context: Context) {
     suspend fun deleteService(name: String) {
         val current = _config.value
         saveConfig(
-            current.copy(services = current.services.filterNot { it.name == name })
+            current.copy(services = current.services.filterNot { it.name == name }.toMutableList())
         )
     }
 
     suspend fun deleteOutbound(name: String) {
         val current = _config.value
         saveConfig(
-            current.copy(outbounds = current.outbounds.filterNot { it.name == name })
+            current.copy(outbounds = current.outbounds.filterNot { it.name == name }.toMutableList())
         )
     }
 
