@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ZBProxy</string>
+    <string name="service_description">ZBProxy TCP relay service running</string>
+    <string name="channel_name">ZBProxy Service</string>
+    <string name="channel_description">ZBProxy relay service status</string>
+    <string name="notification_channel_logs">Proxy Logs</string>
+    <string name="stop_service">Stop</string>
+    <string name="start_service">Start</string>
+</resources>
