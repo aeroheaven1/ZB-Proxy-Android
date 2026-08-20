@@ -13,6 +13,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -20,12 +22,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.zbproxy.android.proxy.ProxyServer
 import com.zbproxy.android.proxy.ProxyStatus
 import com.zbproxy.android.service.ProxyForegroundService
@@ -90,13 +86,15 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun ZBProxyMainScreen(proxyServer: ProxyServer) {
-        val navController = rememberNavController()
         val scope = rememberCoroutineScope()
         val config by App.instance.configManager.config.collectAsStateWithLifecycle()
         var proxyStatus by remember { mutableStateOf(ProxyStatus()) }
         val snackbarHostState = remember { SnackbarHostState() }
         var showPrivacyDialog by remember { mutableStateOf(!isPrivacyHandled()) }
         var showDeclineMessage by remember { mutableStateOf(false) }
+
+        // Horizontal pager for swipeable pages (Home / Services / Logs / About)
+        val pagerState = rememberPagerState(initialPage = 0) { bottomNavItems.size }
 
         // Refresh proxy status periodically
         LaunchedEffect(proxyServer) {
@@ -106,19 +104,14 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = navBackStackEntry?.destination
-
         Scaffold(
             snackbarHost = { SnackbarHost(snackbarHostState) },
             bottomBar = {
                 NavigationBar(
                     tonalElevation = 3.dp
                 ) {
-                    bottomNavItems.forEach { item ->
-                        val selected = currentDestination?.hierarchy?.any {
-                            it.route == item.screen.route
-                        } == true
+                    bottomNavItems.forEachIndexed { index, item ->
+                        val selected = pagerState.currentPage == index
 
                         NavigationBarItem(
                             icon = {
@@ -130,12 +123,8 @@ class MainActivity : ComponentActivity() {
                             label = { Text(stringResource(item.screen.labelRes)) },
                             selected = selected,
                             onClick = {
-                                navController.navigate(item.screen.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
+                                scope.launch {
+                                    pagerState.animateScrollToPage(index)
                                 }
                             }
                         )
@@ -143,13 +132,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
         ) { paddingValues ->
-            NavHost(
-                navController = navController,
-                startDestination = Screen.Home.route,
-                modifier = Modifier.padding(paddingValues)
-            ) {
-                composable(Screen.Home.route) {
-                    HomeScreen(
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.padding(paddingValues),
+                beyondViewportPageCount = 1
+            ) { page ->
+                when (bottomNavItems[page].screen) {
+                    Screen.Home -> HomeScreen(
                         proxyStatus = proxyStatus,
                         onStartProxy = {
                             startProxyService()
@@ -164,9 +153,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     )
-                }
-                composable(Screen.Services.route) {
-                    ServicesScreen(
+                    Screen.Services -> ServicesScreen(
                         config = config,
                         onUpdateService = { service ->
                             scope.launch {
@@ -189,12 +176,8 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     )
-                }
-                composable(Screen.Logs.route) {
-                    LogsScreen(logCollector = App.instance.logCollector)
-                }
-                composable(Screen.About.route) {
-                    AboutScreen(
+                    Screen.Logs -> LogsScreen(logCollector = App.instance.logCollector)
+                    Screen.About -> AboutScreen(
                         onShowPrivacy = { showPrivacyDialog = true }
                     )
                 }
