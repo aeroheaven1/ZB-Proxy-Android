@@ -304,6 +304,9 @@ fun ServiceEditDialog(
     var enableMinecraft by remember { mutableStateOf(service.minecraft != null) }
     var rewriteHostname by remember { mutableStateOf(service.minecraft?.rewrittenHostname ?: "mc.hypixel.net") }
     var motdDescription by remember { mutableStateOf(service.minecraft?.motdDescription ?: "") }
+    var scoreboardText by remember {
+        mutableStateOf((service.minecraft?.scoreboardLines ?: emptyList()).joinToString("\n"))
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -373,6 +376,17 @@ fun ServiceEditDialog(
                         },
                         singleLine = true
                     )
+                    OutlinedTextField(
+                        value = scoreboardText,
+                        onValueChange = { scoreboardText = it },
+                        label = { Text(stringResource(R.string.svc_scoreboard)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        supportingText = {
+                            Text(stringResource(R.string.svc_scoreboard_hint), fontSize = 11.sp)
+                        },
+                        minLines = 3,
+                        maxLines = 8
+                    )
                 }
             }
         },
@@ -386,7 +400,8 @@ fun ServiceEditDialog(
                     minecraft = if (enableMinecraft) MinecraftServiceConfig(
                         enableHostnameRewrite = true,
                         rewrittenHostname = rewriteHostname.replace("\n", "").replace("\r", ""),
-                        motdDescription = motdDescription.replace("\n", "").replace("\r", "").ifEmpty { "{DEFAULT_MOTD}" }
+                        motdDescription = motdDescription.replace("\n", "").replace("\r", "").ifEmpty { "{DEFAULT_MOTD}" },
+                        scoreboardLines = scoreboardText.split("\n").map { it.trim() }.filter { it.isNotEmpty() }
                     ) else null
                 ))
             }) {
@@ -415,6 +430,9 @@ fun OutboundEditDialog(
     var enableMinecraft by remember { mutableStateOf(outbound.minecraft != null) }
     var rewriteHostname by remember { mutableStateOf(outbound.minecraft?.rewrittenHostname ?: "mc.hypixel.net") }
     var motdDescription by remember { mutableStateOf(outbound.minecraft?.motdDescription ?: "") }
+    var scoreboardText by remember {
+        mutableStateOf((outbound.minecraft?.scoreboardLines ?: emptyList()).joinToString("\n"))
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -476,6 +494,17 @@ fun OutboundEditDialog(
                         },
                         singleLine = true
                     )
+                    OutlinedTextField(
+                        value = scoreboardText,
+                        onValueChange = { scoreboardText = it },
+                        label = { Text(stringResource(R.string.svc_scoreboard)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        supportingText = {
+                            Text(stringResource(R.string.svc_scoreboard_hint), fontSize = 11.sp)
+                        },
+                        minLines = 3,
+                        maxLines = 8
+                    )
                 }
             }
         },
@@ -488,7 +517,8 @@ fun OutboundEditDialog(
                     minecraft = if (enableMinecraft) MinecraftServiceConfig(
                         enableHostnameRewrite = true,
                         rewrittenHostname = rewriteHostname.replace("\n", "").replace("\r", ""),
-                        motdDescription = motdDescription.replace("\n", "").replace("\r", "").ifEmpty { "{DEFAULT_MOTD}" }
+                        motdDescription = motdDescription.replace("\n", "").replace("\r", "").ifEmpty { "{DEFAULT_MOTD}" },
+                        scoreboardLines = scoreboardText.split("\n").map { it.trim() }.filter { it.isNotEmpty() }
                     ) else null
                 ))
             }) {

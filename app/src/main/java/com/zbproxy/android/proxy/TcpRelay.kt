@@ -20,6 +20,7 @@ class TcpRelay(
     private val minecraftHostnameRewrite: String? = null,
     private val minecraftPortRewrite: Int? = null,
     private val motdDescription: String? = null,
+    private val scoreboardLines: List<String>? = null,
     private val logCollector: LogCollector,
     private val connectionId: String,
     private val scope: CoroutineScope
@@ -79,6 +80,9 @@ class TcpRelay(
                     if (handshake.nextState == MinecraftProtocol.STATE_STATUS) {
                         // STATUS: intercept the status response to apply custom MOTD
                         handleStatusFlow(clientIn, clientOut, targetIn, targetOut, handshake)
+                    } else if (scoreboardLines != null && scoreboardLines.isNotEmpty()) {
+                        // LOGIN: inject custom sidebar scoreboard after login success
+                        handleLoginWithScoreboard(clientIn, clientOut, targetIn, targetOut, handshake)
                     } else {
                         // LOGIN: plain bidirectional relay
                         startBidirectionalRelay(clientIn, clientOut, targetIn, targetOut)
@@ -147,6 +151,95 @@ class TcpRelay(
             logCollector.debug("Relay",
                 "[$connectionId] Status flow error: ${e.message}")
             startBidirectionalRelay(clientIn, clientOut, targetIn, targetOut)
+        }
+    }
+
+    /**
+     * Minecraft login flow with sidebar scoreboard injection:
+     * 1. Forward all login packets from server until Login Success (0x02) is seen
+     * 2. Forward one client packet (Login Acknowledged or first play packet)
+     * 3. Inject the custom sidebar scoreboard
+     * 4. Continue plain bidirectional relay
+     */
+    private suspend fun handleLoginWithScoreboard(
+        clientIn: java.io.InputStream,
+        clientOut: java.io.OutputStream,
+        targetIn: java.io.InputStream,
+        targetOut: java.io.OutputStream,
+        handshake: MinecraftProtocol.HandshakeData
+    ) {
+        try {
+            // Give the client socket a short read timeout so we don't block forever
+            val originalTimeout = clientSocket.soTimeout
+            clientSocket.soTimeout = 3000
+
+            // Read server -> client packets until Login Success (0x02)
+            var loginSuccessSeen = false
+            var readCount = 0
+            while (!loginSuccessSeen && readCount < 30) {
+                val packet = MinecraftProtocol.readPacket(targetIn) ?: break
+                readCount++
+
+                // Forward packet to client
+                MinecraftProtocol.writeVarInt(clientOut, packet.size)
+                clientOut.write(packet)
+                clientOut.flush()
+
+                // Detect Login Success (packet id 0x02 in login state)
+                if (packet.isNotEmpty() && packet[0].toInt() and 0xFF == 0x02) {
+                    loginSuccessSeen = true
+                    logCollector.info("Relay",
+                        "[$connectionId] Login success detected, injecting scoreboard")
+                }
+            }
+
+            if (loginSuccessSeen) {
+                // Forward one client packet (Login Acknowledged for 1.20.2+, or first play packet)
+                val clientPacket = MinecraftProtocol.readPacket(clientIn)
+                if (clientPacket != null) {
+                    MinecraftProtocol.writeVarInt(targetOut, clientPacket.size)
+                    targetOut.write(clientPacket)
+                    targetOut.flush()
+                }
+
+                // Inject the sidebar scoreboard
+                injectScoreboard(clientOut, handshake.protocolVersion)
+            }
+
+            // Restore timeout and continue relay
+            clientSocket.soTimeout = originalTimeout
+            startBidirectionalRelay(clientIn, clientOut, targetIn, targetOut)
+        } catch (e: Exception) {
+            logCollector.debug("Relay",
+                "[$connectionId] Login scoreboard flow error: ${e.message}")
+            startBidirectionalRelay(clientIn, clientOut, targetIn, targetOut)
+        }
+    }
+
+    /**
+     * Build and send the sidebar scoreboard packets to the client.
+     * First line is the title, remaining lines are score entries.
+     */
+    private fun injectScoreboard(clientOut: java.io.OutputStream, protocolVersion: Int) {
+        try {
+            val lines = scoreboardLines ?: emptyList()
+            if (lines.isEmpty()) return
+
+            val title = lines.first().take(32)
+            val body = lines.drop(1).ifEmpty { listOf(" ") }
+
+            val packets = ScoreboardProtocol.buildScoreboardPackets(protocolVersion, title, body)
+            for (packet in packets) {
+                MinecraftProtocol.writeVarInt(clientOut, packet.size)
+                clientOut.write(packet)
+            }
+            clientOut.flush()
+
+            logCollector.info("Relay",
+                "[$connectionId] Scoreboard injected: title='$title', lines=${body.size}")
+        } catch (e: Exception) {
+            logCollector.warn("Relay",
+                "[$connectionId] Scoreboard injection failed: ${e.message}")
         }
     }
 
