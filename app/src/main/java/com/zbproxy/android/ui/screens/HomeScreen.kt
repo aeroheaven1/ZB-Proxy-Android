@@ -9,10 +9,12 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zbproxy.android.R
 import com.zbproxy.android.proxy.ProxyStatus
 import com.zbproxy.android.ui.theme.StatusRunning
 import com.zbproxy.android.ui.theme.StatusStopped
@@ -50,16 +52,16 @@ fun HomeScreen(
                 ) {
                     StatCard(
                         modifier = Modifier.weight(1f),
-                        title = "Connections",
+                        title = stringResource(R.string.home_connections),
                         value = "${proxyStatus.activeConnections}",
-                        subtitle = "active",
+                        subtitle = stringResource(R.string.home_active),
                         icon = Icons.Filled.People
                     )
                     StatCard(
                         modifier = Modifier.weight(1f),
-                        title = "Total",
+                        title = stringResource(R.string.home_total),
                         value = "${proxyStatus.totalConnections}",
-                        subtitle = "served",
+                        subtitle = stringResource(R.string.home_served),
                         icon = Icons.Filled.TrendingUp
                     )
                 }
@@ -69,7 +71,7 @@ fun HomeScreen(
         // Services
         item {
             Text(
-                text = "Services",
+                text = stringResource(R.string.home_services),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(top = 8.dp)
@@ -104,12 +106,12 @@ fun HomeScreen(
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "No services configured",
+                            stringResource(R.string.home_no_services),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            "Add services in the Services tab",
+                            stringResource(R.string.home_no_services_hint),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                         )
@@ -161,7 +163,7 @@ fun ProxyStatusCard(
                 Spacer(Modifier.width(12.dp))
 
                 Text(
-                    text = if (isRunning) "Proxy Running" else "Proxy Stopped",
+                    text = stringResource(if (isRunning) R.string.home_proxy_running else R.string.home_proxy_stopped),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -188,7 +190,7 @@ fun ProxyStatusCard(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(Modifier.width(4.dp))
-                    Text(if (isRunning) "Stop" else "Start")
+                    Text(stringResource(if (isRunning) R.string.home_stop else R.string.home_start))
                 }
             }
 
@@ -201,8 +203,8 @@ fun ProxyStatusCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    StatusItem("Active", "$activeConnections")
-                    StatusItem("Total Served", "$totalConnections")
+                    StatusItem(stringResource(R.string.home_active_connections), "$activeConnections")
+                    StatusItem(stringResource(R.string.home_total_served), "$totalConnections")
                 }
             }
         }
@@ -319,7 +321,7 @@ fun ServiceStatusCard(service: com.zbproxy.android.proxy.ServiceStatus) {
                 color = MaterialTheme.colorScheme.secondaryContainer
             ) {
                 Text(
-                    text = "${service.activeConnections} conns",
+                    text = stringResource(R.string.home_conns, service.activeConnections),
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSecondaryContainer

@@ -1,5 +1,6 @@
 package com.zbproxy.android.ui.navigation
 
+import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.Home
@@ -10,12 +11,13 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.zbproxy.android.R
 
-sealed class Screen(val route: String, val label: String) {
-    object Home : Screen("home", "Home")
-    object Services : Screen("services", "Services")
-    object Logs : Screen("logs", "Logs")
-    object About : Screen("about", "About")
+sealed class Screen(val route: String, @StringRes val labelRes: Int) {
+    object Home : Screen("home", R.string.nav_home)
+    object Services : Screen("services", R.string.nav_services)
+    object Logs : Screen("logs", R.string.nav_logs)
+    object About : Screen("about", R.string.nav_about)
 }
 
 data class BottomNavItem(

@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private val proxyServer = ProxyServer(App.instance.configManager, App.instance.logCollector)
+    private val proxyServer = ProxyServer.getInstance(App.instance.configManager, App.instance.logCollector)
 
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -100,10 +100,10 @@ class MainActivity : ComponentActivity() {
                             icon = {
                                 Icon(
                                     if (selected) item.selectedIcon else item.unselectedIcon,
-                                    contentDescription = item.screen.label
+                                    contentDescription = stringResource(item.screen.labelRes)
                                 )
                             },
-                            label = { Text(item.screen.label) },
+                            label = { Text(stringResource(item.screen.labelRes)) },
                             selected = selected,
                             onClick = {
                                 navController.navigate(item.screen.route) {
@@ -130,13 +130,13 @@ class MainActivity : ComponentActivity() {
                         onStartProxy = {
                             startProxyService()
                             scope.launch {
-                                snackbarHostState.showSnackbar("Starting proxy...")
+                                snackbarHostState.showSnackbar(getString(R.string.home_starting))
                             }
                         },
                         onStopProxy = {
                             stopProxyService()
                             scope.launch {
-                                snackbarHostState.showSnackbar("Stopping proxy...")
+                                snackbarHostState.showSnackbar(getString(R.string.home_stopping))
                             }
                         }
                     )

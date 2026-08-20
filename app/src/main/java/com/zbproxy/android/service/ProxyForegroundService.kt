@@ -22,7 +22,7 @@ class ProxyForegroundService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        proxyServer = ProxyServer(App.instance.configManager, App.instance.logCollector)
+        proxyServer = ProxyServer.getInstance(App.instance.configManager, App.instance.logCollector)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -87,12 +87,14 @@ class ProxyForegroundService : Service() {
         )
 
         return NotificationCompat.Builder(this, App.CHANNEL_SERVICE)
-            .setContentTitle(if (running) "ZBProxy Running" else "ZBProxy Starting...")
+            .setContentTitle(
+                if (running) getString(R.string.notif_running) else getString(R.string.notif_starting)
+            )
             .setContentText(
                 if (running && connections > 0)
-                    "Active connections: $connections"
+                    getString(R.string.notif_active_conns, connections)
                 else
-                    "TCP relay service active"
+                    getString(R.string.notif_service_active)
             )
             .setSmallIcon(android.R.drawable.ic_menu_share)
             .setContentIntent(contentIntent)

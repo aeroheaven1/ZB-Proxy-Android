@@ -27,7 +27,7 @@ data class ServiceStatus(
     val isRunning: Boolean
 )
 
-class ProxyServer(
+class ProxyServer private constructor(
     private val configManager: ConfigManager,
     private val logCollector: LogCollector
 ) {
@@ -241,5 +241,16 @@ class ProxyServer(
         scope.cancel()
         serverSockets.values.forEach { try { it.close() } catch (_: Exception) {} }
         activeConnections.values.forEach { try { it.stop() } catch (_: Exception) {} }
+    }
+
+    companion object {
+        @Volatile
+        private var instance: ProxyServer? = null
+
+        fun getInstance(configManager: ConfigManager, logCollector: LogCollector): ProxyServer {
+            return instance ?: synchronized(this) {
+                instance ?: ProxyServer(configManager, logCollector).also { instance = it }
+            }
+        }
     }
 }

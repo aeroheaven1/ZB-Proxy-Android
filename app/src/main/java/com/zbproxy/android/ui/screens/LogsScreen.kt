@@ -11,10 +11,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zbproxy.android.R
 import com.zbproxy.android.util.LogCollector
 import com.zbproxy.android.util.LogEntry
 import kotlinx.coroutines.launch
@@ -55,22 +57,22 @@ fun LogsScreen(logCollector: LogCollector) {
                 FilterChip(
                     selected = filterLevel == null,
                     onClick = { filterLevel = null },
-                    label = { Text("All", fontSize = 11.sp) }
+                    label = { Text(stringResource(R.string.logs_all), fontSize = 11.sp) }
                 )
                 FilterChip(
                     selected = filterLevel == LogEntry.Level.INFO,
                     onClick = { filterLevel = if (filterLevel == LogEntry.Level.INFO) null else LogEntry.Level.INFO },
-                    label = { Text("Info", fontSize = 11.sp) }
+                    label = { Text(stringResource(R.string.logs_info), fontSize = 11.sp) }
                 )
                 FilterChip(
                     selected = filterLevel == LogEntry.Level.WARN,
                     onClick = { filterLevel = if (filterLevel == LogEntry.Level.WARN) null else LogEntry.Level.WARN },
-                    label = { Text("Warn", fontSize = 11.sp) }
+                    label = { Text(stringResource(R.string.logs_warn), fontSize = 11.sp) }
                 )
                 FilterChip(
                     selected = filterLevel == LogEntry.Level.ERROR,
                     onClick = { filterLevel = if (filterLevel == LogEntry.Level.ERROR) null else LogEntry.Level.ERROR },
-                    label = { Text("Error", fontSize = 11.sp) }
+                    label = { Text(stringResource(R.string.logs_error), fontSize = 11.sp) }
                 )
             }
 
@@ -79,13 +81,13 @@ fun LogsScreen(logCollector: LogCollector) {
                 IconButton(onClick = { autoScroll = !autoScroll }) {
                     Icon(
                         if (autoScroll) Icons.Filled.VerticalAlignBottom else Icons.Filled.Pause,
-                        contentDescription = "Auto-scroll",
+                        contentDescription = stringResource(R.string.logs_autoscroll),
                         tint = if (autoScroll) MaterialTheme.colorScheme.primary
                         else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 IconButton(onClick = { logCollector.clear() }) {
-                    Icon(Icons.Filled.DeleteSweep, "Clear logs")
+                    Icon(Icons.Filled.DeleteSweep, stringResource(R.string.logs_clear))
                 }
             }
         }
@@ -107,12 +109,12 @@ fun LogsScreen(logCollector: LogCollector) {
                     )
                     Spacer(Modifier.height(12.dp))
                     Text(
-                        "No logs yet",
+                        stringResource(R.string.logs_empty),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        "Start the proxy to see logs",
+                        stringResource(R.string.logs_empty_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )

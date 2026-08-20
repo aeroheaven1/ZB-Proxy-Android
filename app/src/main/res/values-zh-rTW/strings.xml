@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App -->
+    <string name="app_name">ZBProxy</string>
+    <string name="service_description">ZBProxy TCP 中繼服務運行中</string>
+    <string name="channel_name">ZBProxy 服務</string>
+    <string name="channel_description">ZBProxy 中繼服務狀態</string>
+    <string name="notification_channel_logs">代理日誌</string>
+    <string name="stop_service">停止</string>
+    <string name="start_service">啟動</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">首頁</string>
+    <string name="nav_services">服務</string>
+    <string name="nav_logs">日誌</string>
+    <string name="nav_about">關於</string>
+
+    <!-- Home -->
+    <string name="home_proxy_running">代理運行中</string>
+    <string name="home_proxy_stopped">代理已停止</string>
+    <string name="home_start">啟動</string>
+    <string name="home_stop">停止</string>
+    <string name="home_active_connections">活躍連線</string>
+    <string name="home_total_served">累計服務</string>
+    <string name="home_connections">連線數</string>
+    <string name="home_total">總計</string>
+    <string name="home_active">活躍</string>
+    <string name="home_served">已服務</string>
+    <string name="home_services">服務</string>
+    <string name="home_no_services">未設定服務</string>
+    <string name="home_no_services_hint">請在服務頁面新增服務</string>
+    <string name="home_conns">%1$d 連線</string>
+    <string name="home_starting">正在啟動代理…</string>
+    <string name="home_stopping">正在停止代理…</string>
+
+    <!-- Services -->
+    <string name="svc_services">服務</string>
+    <string name="svc_outbounds">出站</string>
+    <string name="svc_add_service">新增服務</string>
+    <string name="svc_add_outbound">新增上游</string>
+    <string name="svc_edit_service">編輯服務</string>
+    <string name="svc_edit_outbound">編輯上游</string>
+    <string name="svc_add_service_title">新增服務</string>
+    <string name="svc_add_outbound_title">新增上游</string>
+    <string name="svc_save">儲存</string>
+    <string name="svc_cancel">取消</string>
+    <string name="svc_name">服務名稱</string>
+    <string name="svc_outbound_name">上游名稱</string>
+    <string name="svc_listen_port">監聽埠</string>
+    <string name="svc_target_address">目標位址</string>
+    <string name="svc_target_port">目標埠</string>
+    <string name="svc_enable_minecraft">啟用 Minecraft 協定</string>
+    <string name="svc_minecraft_protocol">Minecraft 協定</string>
+    <string name="svc_rewrite_hostname">重寫主機名</string>
+    <string name="svc_minecraft">Minecraft</string>
+    <string name="svc_minecraft_rewrite">Minecraft 重寫</string>
+    <string name="svc_listen">監聽</string>
+    <string name="svc_target">目標</string>
+    <string name="svc_edit">編輯</string>
+    <string name="svc_delete">刪除</string>
+    <string name="svc_new_service">新服務</string>
+    <string name="svc_new_outbound">新上游</string>
+
+    <!-- Logs -->
+    <string name="logs_all">全部</string>
+    <string name="logs_info">資訊</string>
+    <string name="logs_warn">警告</string>
+    <string name="logs_error">錯誤</string>
+    <string name="logs_empty">暫無日誌</string>
+    <string name="logs_empty_hint">啟動代理後檢視日誌</string>
+    <string name="logs_clear">清空日誌</string>
+    <string name="logs_autoscroll">自動捲動</string>
+
+    <!-- About -->
+    <string name="about_version">v3.1.0（Android）</string>
+    <string name="about_desc">一個簡單、快速、高效能的多用途 TCP 中繼。\n主要為搭建 Hypixel 加速 IP 而開發。</string>
+    <string name="about_features">功能特性</string>
+    <string name="about_feature_1">一鍵部署</string>
+    <string name="about_feature_2">高可自訂的設定</string>
+    <string name="about_feature_3">支援 Minecraft 協定的 TCP 中繼</string>
+    <string name="about_feature_4">Hypixel 主機名重寫</string>
+    <string name="about_feature_5">IP 存取控制（黑白名單）</string>
+    <string name="about_feature_6">MOTD 和圖示自訂</string>
+    <string name="about_feature_7">乾淨多彩的日誌輸出</string>
+    <string name="about_feature_8">多平台多架構支援</string>
+    <string name="about_source_code">原始碼</string>
+    <string name="about_license">授權</string>
+    <string name="about_author">作者</string>
+    <string name="about_built_with">使用 Jetpack Compose 和 Material Design 3 構建</string>
+
+    <!-- Service Notification -->
+    <string name="notif_running">ZBProxy 運行中</string>
+    <string name="notif_starting">ZBProxy 啟動中…</string>
+    <string name="notif_active_conns">活躍連線：%1$d</string>
+    <string name="notif_service_active">TCP 中繼服務運行中</string>
+</resources>

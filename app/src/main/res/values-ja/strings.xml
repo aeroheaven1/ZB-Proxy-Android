@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App -->
+    <string name="app_name">ZBProxy</string>
+    <string name="service_description">ZBProxy TCP リレーサービス実行中</string>
+    <string name="channel_name">ZBProxy サービス</string>
+    <string name="channel_description">ZBProxy リレーサービスの状態</string>
+    <string name="notification_channel_logs">プロキシログ</string>
+    <string name="stop_service">停止</string>
+    <string name="start_service">開始</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">ホーム</string>
+    <string name="nav_services">サービス</string>
+    <string name="nav_logs">ログ</string>
+    <string name="nav_about">情報</string>
+
+    <!-- Home -->
+    <string name="home_proxy_running">プロキシ実行中</string>
+    <string name="home_proxy_stopped">プロキシ停止中</string>
+    <string name="home_start">開始</string>
+    <string name="home_stop">停止</string>
+    <string name="home_active_connections">アクティブ</string>
+    <string name="home_total_served">累計接続</string>
+    <string name="home_connections">接続数</string>
+    <string name="home_total">合計</string>
+    <string name="home_active">アクティブ</string>
+    <string name="home_served">処理済み</string>
+    <string name="home_services">サービス</string>
+    <string name="home_no_services">サービスが設定されていません</string>
+    <string name="home_no_services_hint">サービスページで追加してください</string>
+    <string name="home_conns">%1$d 接続</string>
+    <string name="home_starting">プロキシを起動中…</string>
+    <string name="home_stopping">プロキシを停止中…</string>
+
+    <!-- Services -->
+    <string name="svc_services">サービス</string>
+    <string name="svc_outbounds">アウトバウンド</string>
+    <string name="svc_add_service">サービスを追加</string>
+    <string name="svc_add_outbound">アウトバウンドを追加</string>
+    <string name="svc_edit_service">サービスを編集</string>
+    <string name="svc_edit_outbound">アウトバウンドを編集</string>
+    <string name="svc_add_service_title">サービスを追加</string>
+    <string name="svc_add_outbound_title">アウトバウンドを追加</string>
+    <string name="svc_save">保存</string>
+    <string name="svc_cancel">キャンセル</string>
+    <string name="svc_name">サービス名</string>
+    <string name="svc_outbound_name">アウトバウンド名</string>
+    <string name="svc_listen_port">リッスンポート</string>
+    <string name="svc_target_address">ターゲットアドレス</string>
+    <string name="svc_target_port">ターゲットポート</string>
+    <string name="svc_enable_minecraft">Minecraft プロトコルを有効化</string>
+    <string name="svc_minecraft_protocol">Minecraft プロトコル</string>
+    <string name="svc_rewrite_hostname">ホスト名を書き換え</string>
+    <string name="svc_minecraft">Minecraft</string>
+    <string name="svc_minecraft_rewrite">Minecraft 書き換え</string>
+    <string name="svc_listen">リッスン</string>
+    <string name="svc_target">ターゲット</string>
+    <string name="svc_edit">編集</string>
+    <string name="svc_delete">削除</string>
+    <string name="svc_new_service">新規サービス</string>
+    <string name="svc_new_outbound">新規アウトバウンド</string>
+
+    <!-- Logs -->
+    <string name="logs_all">すべて</string>
+    <string name="logs_info">情報</string>
+    <string name="logs_warn">警告</string>
+    <string name="logs_error">エラー</string>
+    <string name="logs_empty">ログはまだありません</string>
+    <string name="logs_empty_hint">プロキシを起動するとログが表示されます</string>
+    <string name="logs_clear">ログをクリア</string>
+    <string name="logs_autoscroll">自動スクロール</string>
+
+    <!-- About -->
+    <string name="about_version">v3.1.0（Android）</string>
+    <string name="about_desc">シンプルで高速な多目的 TCP リレー。\n主に Hypixel リバースプロキシの構築用に開発されました。</string>
+    <string name="about_features">機能</string>
+    <string name="about_feature_1">ワンクリック起動</string>
+    <string name="about_feature_2">高度なカスタマイズ設定</string>
+    <string name="about_feature_3">Minecraft プロトコル対応 TCP リレー</string>
+    <string name="about_feature_4">Hypixel ホスト名書き換え</string>
+    <string name="about_feature_5">IP アクセス制御（ホワイト/ブラックリスト）</string>
+    <string name="about_feature_6">MOTD とアイコンのカスタマイズ</string>
+    <string name="about_feature_7">クリーンでカラフルなログ出力</string>
+    <string name="about_feature_8">複数プラットフォーム対応</string>
+    <string name="about_source_code">ソースコード</string>
+    <string name="about_license">ライセンス</string>
+    <string name="about_author">作者</string>
+    <string name="about_built_with">Jetpack Compose &amp; Material Design 3 で構築</string>
+
+    <!-- Service Notification -->
+    <string name="notif_running">ZBProxy 実行中</string>
+    <string name="notif_starting">ZBProxy 起動中…</string>
+    <string name="notif_active_conns">アクティブ接続: %1$d</string>
+    <string name="notif_service_active">TCP リレーサービス実行中</string>
+</resources>

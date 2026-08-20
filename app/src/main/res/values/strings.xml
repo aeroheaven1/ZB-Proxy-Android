@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App -->
     <string name="app_name">ZBProxy</string>
     <string name="service_description">ZBProxy TCP relay service running</string>
     <string name="channel_name">ZBProxy Service</string>
@@ -7,4 +8,89 @@
     <string name="notification_channel_logs">Proxy Logs</string>
     <string name="stop_service">Stop</string>
     <string name="start_service">Start</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_services">Services</string>
+    <string name="nav_logs">Logs</string>
+    <string name="nav_about">About</string>
+
+    <!-- Home -->
+    <string name="home_proxy_running">Proxy Running</string>
+    <string name="home_proxy_stopped">Proxy Stopped</string>
+    <string name="home_start">Start</string>
+    <string name="home_stop">Stop</string>
+    <string name="home_active_connections">Active</string>
+    <string name="home_total_served">Total Served</string>
+    <string name="home_connections">Connections</string>
+    <string name="home_total">Total</string>
+    <string name="home_active">active</string>
+    <string name="home_served">served</string>
+    <string name="home_services">Services</string>
+    <string name="home_no_services">No services configured</string>
+    <string name="home_no_services_hint">Add services in the Services tab</string>
+    <string name="home_conns">%1$d conns</string>
+    <string name="home_starting">Starting proxy…</string>
+    <string name="home_stopping">Stopping proxy…</string>
+
+    <!-- Services -->
+    <string name="svc_services">Services</string>
+    <string name="svc_outbounds">Outbounds</string>
+    <string name="svc_add_service">Add Service</string>
+    <string name="svc_add_outbound">Add Outbound</string>
+    <string name="svc_edit_service">Edit Service</string>
+    <string name="svc_edit_outbound">Edit Outbound</string>
+    <string name="svc_add_service_title">Add Service</string>
+    <string name="svc_add_outbound_title">Add Outbound</string>
+    <string name="svc_save">Save</string>
+    <string name="svc_cancel">Cancel</string>
+    <string name="svc_name">Service Name</string>
+    <string name="svc_outbound_name">Outbound Name</string>
+    <string name="svc_listen_port">Listen Port</string>
+    <string name="svc_target_address">Target Address</string>
+    <string name="svc_target_port">Target Port</string>
+    <string name="svc_enable_minecraft">Enable Minecraft Protocol</string>
+    <string name="svc_minecraft_protocol">Minecraft Protocol</string>
+    <string name="svc_rewrite_hostname">Rewrite Hostname</string>
+    <string name="svc_minecraft">Minecraft</string>
+    <string name="svc_minecraft_rewrite">Minecraft rewrite</string>
+    <string name="svc_listen">Listen</string>
+    <string name="svc_target">Target</string>
+    <string name="svc_edit">Edit</string>
+    <string name="svc_delete">Delete</string>
+    <string name="svc_new_service">New-Service</string>
+    <string name="svc_new_outbound">New-Outbound</string>
+
+    <!-- Logs -->
+    <string name="logs_all">All</string>
+    <string name="logs_info">Info</string>
+    <string name="logs_warn">Warn</string>
+    <string name="logs_error">Error</string>
+    <string name="logs_empty">No logs yet</string>
+    <string name="logs_empty_hint">Start the proxy to see logs</string>
+    <string name="logs_clear">Clear logs</string>
+    <string name="logs_autoscroll">Auto-scroll</string>
+
+    <!-- About -->
+    <string name="about_version">v3.1.0 (Android)</string>
+    <string name="about_desc">A simple, fast, high performance multipurpose TCP relay.\nPrimarily developed for building Hypixel reverse proxies.</string>
+    <string name="about_features">Features</string>
+    <string name="about_feature_1">One click to go</string>
+    <string name="about_feature_2">Highly customizable configuration</string>
+    <string name="about_feature_3">TCP relay with Minecraft protocol support</string>
+    <string name="about_feature_4">Hostname rewriting for Hypixel</string>
+    <string name="about_feature_5">IP access control (whitelist/blacklist)</string>
+    <string name="about_feature_6">MOTD and favicon customization</string>
+    <string name="about_feature_7">Clean and colorful log outputs</string>
+    <string name="about_feature_8">Multiple platforms and architectures</string>
+    <string name="about_source_code">Source Code</string>
+    <string name="about_license">License</string>
+    <string name="about_author">Author</string>
+    <string name="about_built_with">Built with Jetpack Compose &amp; Material Design 3</string>
+
+    <!-- Service Notification -->
+    <string name="notif_running">ZBProxy Running</string>
+    <string name="notif_starting">ZBProxy Starting…</string>
+    <string name="notif_active_conns">Active connections: %1$d</string>
+    <string name="notif_service_active">TCP relay service active</string>
 </resources>

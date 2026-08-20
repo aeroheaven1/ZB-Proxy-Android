@@ -9,11 +9,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zbproxy.android.R
 
 @Composable
 fun AboutScreen() {
@@ -52,7 +54,7 @@ fun AboutScreen() {
         )
 
         Text(
-            "v3.1.0 (Android)",
+            stringResource(R.string.about_version),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontFamily = FontFamily.Monospace
@@ -61,7 +63,7 @@ fun AboutScreen() {
         Spacer(Modifier.height(8.dp))
 
         Text(
-            "A simple, fast, high performance multipurpose TCP relay.\nPrimarily developed for building Hypixel reverse proxies.",
+            stringResource(R.string.about_desc),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -78,19 +80,19 @@ fun AboutScreen() {
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    "Features",
+                    stringResource(R.string.about_features),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(Modifier.height(8.dp))
-                FeatureItem("One click to go")
-                FeatureItem("Highly customizable configuration")
-                FeatureItem("TCP relay with Minecraft protocol support")
-                FeatureItem("Hostname rewriting for Hypixel")
-                FeatureItem("IP access control (whitelist/blacklist)")
-                FeatureItem("MOTD and favicon customization")
-                FeatureItem("Clean and colorful log outputs")
-                FeatureItem("Multiple platforms and architectures")
+                FeatureItem(stringResource(R.string.about_feature_1))
+                FeatureItem(stringResource(R.string.about_feature_2))
+                FeatureItem(stringResource(R.string.about_feature_3))
+                FeatureItem(stringResource(R.string.about_feature_4))
+                FeatureItem(stringResource(R.string.about_feature_5))
+                FeatureItem(stringResource(R.string.about_feature_6))
+                FeatureItem(stringResource(R.string.about_feature_7))
+                FeatureItem(stringResource(R.string.about_feature_8))
             }
         }
 
@@ -115,7 +117,7 @@ fun AboutScreen() {
                 Spacer(Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        "Source Code",
+                        stringResource(R.string.about_source_code),
                         style = MaterialTheme.typography.titleSmall
                     )
                     Text(
@@ -152,7 +154,7 @@ fun AboutScreen() {
                 Spacer(Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        "License",
+                        stringResource(R.string.about_license),
                         style = MaterialTheme.typography.titleSmall
                     )
                     Text(
@@ -183,7 +185,7 @@ fun AboutScreen() {
                 Spacer(Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        "Author",
+                        stringResource(R.string.about_author),
                         style = MaterialTheme.typography.titleSmall
                     )
                     Text(
@@ -198,7 +200,7 @@ fun AboutScreen() {
         Spacer(Modifier.height(24.dp))
 
         Text(
-            "Built with Jetpack Compose & Material Design 3",
+            stringResource(R.string.about_built_with),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
             textAlign = TextAlign.Center
