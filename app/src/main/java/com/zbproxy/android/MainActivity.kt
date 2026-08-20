@@ -2,6 +2,7 @@ package com.zbproxy.android
 
 import android.Manifest
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -28,6 +29,7 @@ import androidx.navigation.compose.rememberNavController
 import com.zbproxy.android.proxy.ProxyServer
 import com.zbproxy.android.proxy.ProxyStatus
 import com.zbproxy.android.service.ProxyForegroundService
+import com.zbproxy.android.ui.components.PrivacyDialog
 import com.zbproxy.android.ui.navigation.Screen
 import com.zbproxy.android.ui.navigation.bottomNavItems
 import com.zbproxy.android.ui.screens.*
@@ -61,6 +63,24 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // First-launch privacy consent state
+    private fun isPrivacyHandled(): Boolean {
+        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        return prefs.getBoolean(PREFS_PRIVACY_HANDLED, false)
+    }
+
+    private fun markPrivacyHandled() {
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+            .edit()
+            .putBoolean(PREFS_PRIVACY_HANDLED, true)
+            .apply()
+    }
+
+    companion object {
+        private const val PREFS_NAME = "zbproxy_settings"
+        private const val PREFS_PRIVACY_HANDLED = "privacy_handled"
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         // Do NOT call proxyServer.destroy() here — the singleton is shared
@@ -75,6 +95,8 @@ class MainActivity : ComponentActivity() {
         val config by App.instance.configManager.config.collectAsStateWithLifecycle()
         var proxyStatus by remember { mutableStateOf(ProxyStatus()) }
         val snackbarHostState = remember { SnackbarHostState() }
+        var showPrivacyDialog by remember { mutableStateOf(!isPrivacyHandled()) }
+        var showDeclineMessage by remember { mutableStateOf(false) }
 
         // Refresh proxy status periodically
         LaunchedEffect(proxyServer) {
@@ -172,8 +194,36 @@ class MainActivity : ComponentActivity() {
                     LogsScreen(logCollector = App.instance.logCollector)
                 }
                 composable(Screen.About.route) {
-                    AboutScreen()
+                    AboutScreen(
+                        onShowPrivacy = { showPrivacyDialog = true }
+                    )
                 }
+            }
+        }
+
+        // First-launch Privacy + AI notice dialog
+        if (showPrivacyDialog) {
+            PrivacyDialog(
+                onAgree = {
+                    markPrivacyHandled()
+                    showPrivacyDialog = false
+                },
+                onDecline = {
+                    markPrivacyHandled()
+                    showPrivacyDialog = false
+                    showDeclineMessage = true
+                    scope.launch {
+                        snackbarHostState.showSnackbar(getString(R.string.privacy_declined))
+                    }
+                }
+            )
+        }
+
+        // Decline hint (shown once via snackbar when user declines)
+        if (showDeclineMessage) {
+            LaunchedEffect(Unit) {
+                snackbarHostState.showSnackbar(getString(R.string.privacy_decline_hint))
+                showDeclineMessage = false
             }
         }
     }

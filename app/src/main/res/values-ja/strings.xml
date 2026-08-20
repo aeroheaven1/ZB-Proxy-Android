@@ -87,6 +87,20 @@
     <string name="about_license">ライセンス</string>
     <string name="about_author">作者</string>
     <string name="about_built_with">Jetpack Compose &amp; Material Design 3 で構築</string>
+    <string name="about_privacy_policy">プライバシーポリシー</string>
+    <string name="about_ai_notice">AI 構築に関する通知</string>
+
+    <!-- Privacy / Onboarding -->
+    <string name="privacy_title">ZBProxy へようこそ</string>
+    <string name="privacy_subtitle">ご利用前に以下をご確認ください</string>
+    <string name="privacy_section_privacy">プライバシーポリシー</string>
+    <string name="privacy_body">ZBProxy はお使いのデバイス上で完全に動作し、個人データを収集・保存・アップロード・共有することはありません。\n\n• すべての設定はデバイス内にのみ保存されます\n• プロキシ通信はデバイスとターゲットサーバー間で直接転送されます\n• 分析なし、トラッキングなし、広告なし\n• ログはローカルのみで保持され、いつでも消去できます</string>
+    <string name="privacy_section_ai">AI 支援開発に関する通知</string>
+    <string name="privacy_ai_body">このプロジェクトは AI（人工知能）の支援を受けて構築されています。\n\n• ソースコードは AI ツールにより生成・レビューされています\n• コアプロトコルはオープンソースの ZBProxy に基づいています\n• 本番環境での使用前にコードを確認し、自己責任でご利用ください\n• この通知はいつでも無効化できます</string>
+    <string name="privacy_agree">同意して続行</string>
+    <string name="privacy_decline">同意しない</string>
+    <string name="privacy_declined">同意しませんでした。アプリは引き続き動作します。</string>
+    <string name="privacy_decline_hint">プライバシーポリシーと AI 通知は「情報」ページからいつでも確認できます。</string>
 
     <!-- Service Notification -->
     <string name="notif_running">ZBProxy 実行中</string>

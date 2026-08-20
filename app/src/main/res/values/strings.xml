@@ -87,6 +87,20 @@
     <string name="about_license">License</string>
     <string name="about_author">Author</string>
     <string name="about_built_with">Built with Jetpack Compose &amp; Material Design 3</string>
+    <string name="about_privacy_policy">Privacy Policy</string>
+    <string name="about_ai_notice">AI-Built Notice</string>
+
+    <!-- Privacy / Onboarding -->
+    <string name="privacy_title">Welcome to ZBProxy</string>
+    <string name="privacy_subtitle">Before you start, please review the following</string>
+    <string name="privacy_section_privacy">Privacy Policy</string>
+    <string name="privacy_body">ZBProxy runs entirely on your device. We do NOT collect, store, upload or share any personal data.\n\n• All configuration is stored locally on your device\n• Proxy traffic is forwarded directly between your device and the target server\n• No analytics, no tracking, no ads\n• Logs are kept locally and can be cleared anytime</string>
+    <string name="privacy_section_ai">AI-Assisted Development Notice</string>
+    <string name="privacy_ai_body">This project is built with the assistance of AI (artificial intelligence).\n\n• Source code is generated and reviewed with AI tools\n• The core protocol logic is based on the open-source ZBProxy project\n• Use at your own risk — review the code before deploying in production\n• You may disable this notice at any time</string>
+    <string name="privacy_agree">I Agree, Continue</string>
+    <string name="privacy_decline">Decline</string>
+    <string name="privacy_declined">You declined. The app will continue in offline mode.</string>
+    <string name="privacy_decline_hint">You can review the Privacy Policy and AI notice anytime in the About page.</string>
 
     <!-- Service Notification -->
     <string name="notif_running">ZBProxy Running</string>

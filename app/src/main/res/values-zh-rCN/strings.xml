@@ -87,6 +87,20 @@
     <string name="about_license">许可证</string>
     <string name="about_author">作者</string>
     <string name="about_built_with">使用 Jetpack Compose 和 Material Design 3 构建</string>
+    <string name="about_privacy_policy">隐私条款</string>
+    <string name="about_ai_notice">AI 构建声明</string>
+
+    <!-- Privacy / Onboarding -->
+    <string name="privacy_title">欢迎使用 ZBProxy</string>
+    <string name="privacy_subtitle">开始使用前，请阅读以下内容</string>
+    <string name="privacy_section_privacy">隐私条款</string>
+    <string name="privacy_body">ZBProxy 完全在您的设备上运行，我们不收集、存储、上传或共享任何个人数据。\n\n• 所有配置仅保存在您的设备本地\n• 代理流量在您的设备与目标服务器之间直接转发\n• 无分析、无追踪、无广告\n• 日志仅保存在本地，可随时清空</string>
+    <string name="privacy_section_ai">AI 辅助构建声明</string>
+    <string name="privacy_ai_body">本项目使用人工智能（AI）辅助构建。\n\n• 源代码由 AI 工具生成并审阅\n• 核心协议逻辑基于开源项目 ZBProxy\n• 请在部署前自行审查代码，自行承担使用风险\n• 您可以随时在设置中关闭此提示</string>
+    <string name="privacy_agree">我同意，继续使用</string>
+    <string name="privacy_decline">取消（不同意）</string>
+    <string name="privacy_declined">您已选择不同意。应用将继续运行。</string>
+    <string name="privacy_decline_hint">您可以随时在「关于」页面查看隐私条款和 AI 构建声明。</string>
 
     <!-- Service Notification -->
     <string name="notif_running">ZBProxy 运行中</string>

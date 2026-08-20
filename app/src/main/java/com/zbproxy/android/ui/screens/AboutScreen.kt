@@ -18,7 +18,9 @@ import androidx.compose.ui.unit.sp
 import com.zbproxy.android.R
 
 @Composable
-fun AboutScreen() {
+fun AboutScreen(
+    onShowPrivacy: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -163,6 +165,44 @@ fun AboutScreen() {
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+            }
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        // Privacy Policy entry (clickable to re-open the dialog)
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = onShowPrivacy
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Filled.VerifiedUser,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        stringResource(R.string.about_privacy_policy),
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Text(
+                        stringResource(R.string.about_ai_notice),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Icon(
+                    Icons.Filled.OpenInNew,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
 
