@@ -155,11 +155,13 @@ class TcpRelay(
     }
 
     /**
-     * Minecraft login flow with sidebar scoreboard injection:
-     * 1. Forward all login packets from server until Login Success (0x02) is seen
-     * 2. Forward one client packet (Login Acknowledged or first play packet)
-     * 3. Inject the custom sidebar scoreboard
-     * 4. Continue plain bidirectional relay
+     * Minecraft login flow with sidebar scoreboard injection.
+     *
+     * For 1.20.2+ (protocol >= 763) the client enters a Configuration phase after
+     * Login Success, so we must wait for the clientbound Finish Configuration
+     * (packet 0x02 in configuration state) before injecting the scoreboard.
+     *
+     * For older versions, inject right after Login Success + first client packet.
      */
     private suspend fun handleLoginWithScoreboard(
         clientIn: java.io.InputStream,
@@ -171,39 +173,56 @@ class TcpRelay(
         try {
             // Give the client socket a short read timeout so we don't block forever
             val originalTimeout = clientSocket.soTimeout
-            clientSocket.soTimeout = 3000
+            clientSocket.soTimeout = 5000
 
-            // Read server -> client packets until Login Success (0x02)
+            // 1. Read server -> client packets until Login Success (0x02)
             var loginSuccessSeen = false
             var readCount = 0
             while (!loginSuccessSeen && readCount < 30) {
                 val packet = MinecraftProtocol.readPacket(targetIn) ?: break
                 readCount++
+                forwardPacket(clientOut, packet)
 
-                // Forward packet to client
-                MinecraftProtocol.writeVarInt(clientOut, packet.size)
-                clientOut.write(packet)
-                clientOut.flush()
-
-                // Detect Login Success (packet id 0x02 in login state)
                 if (packet.isNotEmpty() && packet[0].toInt() and 0xFF == 0x02) {
                     loginSuccessSeen = true
                     logCollector.info("Relay",
-                        "[$connectionId] Login success detected, injecting scoreboard")
+                        "[$connectionId] Login success detected (protocol ${handshake.protocolVersion})")
                 }
             }
 
             if (loginSuccessSeen) {
-                // Forward one client packet (Login Acknowledged for 1.20.2+, or first play packet)
-                val clientPacket = MinecraftProtocol.readPacket(clientIn)
-                if (clientPacket != null) {
-                    MinecraftProtocol.writeVarInt(targetOut, clientPacket.size)
-                    targetOut.write(clientPacket)
-                    targetOut.flush()
-                }
+                if (handshake.protocolVersion >= 764) {
+                    // 1.20.2+: forward Login Acknowledged, then wait for Configuration finish
+                    val loginAck = MinecraftProtocol.readPacket(clientIn)
+                    if (loginAck != null) forwardPacket(targetOut, loginAck)
 
-                // Inject the sidebar scoreboard
-                injectScoreboard(clientOut, handshake.protocolVersion)
+                    logCollector.debug("Relay",
+                        "[$connectionId] Waiting for configuration finish...")
+                    var configDone = false
+                    var configReads = 0
+                    while (!configDone && configReads < 100) {
+                        val packet = MinecraftProtocol.readPacket(targetIn) ?: break
+                        configReads++
+                        forwardPacket(clientOut, packet)
+                        // Clientbound configuration Finish Configuration = 0x02
+                        if (packet.isNotEmpty() && packet[0].toInt() and 0xFF == 0x02) {
+                            configDone = true
+                            logCollector.info("Relay",
+                                "[$connectionId] Configuration finished, injecting scoreboard")
+                        }
+                    }
+                    if (configDone) {
+                        injectScoreboard(clientOut, handshake.protocolVersion)
+                    } else {
+                        logCollector.warn("Relay",
+                            "[$connectionId] Configuration did not finish, scoreboard skipped")
+                    }
+                } else {
+                    // Older versions: forward one client packet, then inject
+                    val clientPacket = MinecraftProtocol.readPacket(clientIn)
+                    if (clientPacket != null) forwardPacket(targetOut, clientPacket)
+                    injectScoreboard(clientOut, handshake.protocolVersion)
+                }
             }
 
             // Restore timeout and continue relay
@@ -214,6 +233,12 @@ class TcpRelay(
                 "[$connectionId] Login scoreboard flow error: ${e.message}")
             startBidirectionalRelay(clientIn, clientOut, targetIn, targetOut)
         }
+    }
+
+    private fun forwardPacket(output: java.io.OutputStream, packet: ByteArray) {
+        MinecraftProtocol.writeVarInt(output, packet.size)
+        output.write(packet)
+        output.flush()
     }
 
     /**
