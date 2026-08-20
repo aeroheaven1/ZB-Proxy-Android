@@ -52,6 +52,8 @@
     <string name="svc_enable_minecraft">启用 Minecraft 协议</string>
     <string name="svc_minecraft_protocol">Minecraft 协议</string>
     <string name="svc_rewrite_hostname">重写主机名</string>
+    <string name="svc_motd_description">MOTD 描述（服务器列表）</string>
+    <string name="svc_motd_hint">支持 § 颜色代码、\\n 换行，以及 {NAME} {HOST} {PORT} {INFO} 占位符</string>
     <string name="svc_minecraft">Minecraft</string>
     <string name="svc_minecraft_rewrite">Minecraft 重写</string>
     <string name="svc_listen">监听</string>

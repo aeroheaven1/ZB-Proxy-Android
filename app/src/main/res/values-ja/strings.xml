@@ -52,6 +52,8 @@
     <string name="svc_enable_minecraft">Minecraft プロトコルを有効化</string>
     <string name="svc_minecraft_protocol">Minecraft プロトコル</string>
     <string name="svc_rewrite_hostname">ホスト名を書き換え</string>
+    <string name="svc_motd_description">MOTD 説明（サーバーリスト）</string>
+    <string name="svc_motd_hint">§ カラーコード、\\n 改行、{NAME} {HOST} {PORT} {INFO} プレースホルダーに対応</string>
     <string name="svc_minecraft">Minecraft</string>
     <string name="svc_minecraft_rewrite">Minecraft 書き換え</string>
     <string name="svc_listen">リッスン</string>

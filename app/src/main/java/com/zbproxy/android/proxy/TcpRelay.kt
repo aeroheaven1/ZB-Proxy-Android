@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * TCP relay: bidirectional data forwarding between two sockets.
- * Supports Minecraft handshake rewriting on the first packet.
+ * Supports Minecraft handshake rewriting and MOTD customization.
  */
 class TcpRelay(
     private val clientSocket: Socket,
@@ -19,6 +19,7 @@ class TcpRelay(
     private val targetPort: Int,
     private val minecraftHostnameRewrite: String? = null,
     private val minecraftPortRewrite: Int? = null,
+    private val motdDescription: String? = null,
     private val logCollector: LogCollector,
     private val connectionId: String,
     private val scope: CoroutineScope
@@ -75,7 +76,13 @@ class TcpRelay(
                 if (success) {
                     logCollector.info("Relay",
                         "[$connectionId] Minecraft handshake rewritten: ${handshake.serverAddress} -> $minecraftHostnameRewrite")
-                    startBidirectionalRelay(clientIn, clientOut, targetIn, targetOut)
+                    if (handshake.nextState == MinecraftProtocol.STATE_STATUS) {
+                        // STATUS: intercept the status response to apply custom MOTD
+                        handleStatusFlow(clientIn, clientOut, targetIn, targetOut, handshake)
+                    } else {
+                        // LOGIN: plain bidirectional relay
+                        startBidirectionalRelay(clientIn, clientOut, targetIn, targetOut)
+                    }
                     return
                 }
             }
@@ -90,6 +97,56 @@ class TcpRelay(
             logCollector.error("Relay",
                 "[$connectionId] Error in Minecraft handling: ${e.message}")
             startBidirectionalRelay()
+        }
+    }
+
+    /**
+     * Minecraft server-list (status) flow:
+     * 1. Client -> Target: Status Request (0x00)  [forward]
+     * 2. Target -> Client: Status Response (0x00) [intercept & rewrite MOTD]
+     * 3. Remaining traffic (Ping/Pong): plain bidirectional relay
+     */
+    private suspend fun handleStatusFlow(
+        clientIn: java.io.InputStream,
+        clientOut: java.io.OutputStream,
+        targetIn: java.io.InputStream,
+        targetOut: java.io.OutputStream,
+        handshake: MinecraftProtocol.HandshakeData
+    ) {
+        try {
+            // Forward the Status Request packet from client to target
+            val statusRequest = MinecraftProtocol.readPacket(clientIn)
+            if (statusRequest != null) {
+                MinecraftProtocol.writeVarInt(targetOut, statusRequest.size)
+                targetOut.write(statusRequest)
+                targetOut.flush()
+
+                logCollector.debug("Relay",
+                    "[$connectionId] Status request forwarded, awaiting server response")
+
+                // Intercept and rewrite the Status Response (MOTD)
+                val intercepted = MinecraftProtocol.interceptStatusResponse(
+                    targetIn, clientOut,
+                    motdDescription,
+                    connectionId,
+                    handshake.serverAddress,
+                    handshake.serverPort,
+                    logCollector
+                )
+
+                if (!intercepted) {
+                    logCollector.warn("Relay",
+                        "[$connectionId] Could not intercept status response, falling back to raw relay")
+                    startBidirectionalRelay(clientIn, clientOut, targetIn, targetOut)
+                    return
+                }
+            }
+            // Continue relaying remaining traffic (Ping/Pong, etc.)
+            startBidirectionalRelay(clientIn, clientOut, targetIn, targetOut)
+        } catch (e: Exception) {
+            logCollector.debug("Relay",
+                "[$connectionId] Status flow error: ${e.message}")
+            startBidirectionalRelay(clientIn, clientOut, targetIn, targetOut)
         }
     }
 

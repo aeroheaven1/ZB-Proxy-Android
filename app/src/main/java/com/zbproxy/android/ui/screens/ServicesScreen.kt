@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.zbproxy.android.R
 import com.zbproxy.android.proxy.*
 
@@ -302,6 +303,7 @@ fun ServiceEditDialog(
     var targetPort by remember { mutableStateOf(service.targetPort.toString()) }
     var enableMinecraft by remember { mutableStateOf(service.minecraft != null) }
     var rewriteHostname by remember { mutableStateOf(service.minecraft?.rewrittenHostname ?: "mc.hypixel.net") }
+    var motdDescription by remember { mutableStateOf(service.minecraft?.motdDescription ?: "") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -361,6 +363,16 @@ fun ServiceEditDialog(
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
+                    OutlinedTextField(
+                        value = motdDescription,
+                        onValueChange = { motdDescription = it.replace("\n", "").replace("\r", "") },
+                        label = { Text(stringResource(R.string.svc_motd_description)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        supportingText = {
+                            Text(stringResource(R.string.svc_motd_hint), fontSize = 11.sp)
+                        },
+                        singleLine = true
+                    )
                 }
             }
         },
@@ -373,7 +385,8 @@ fun ServiceEditDialog(
                     targetPort = targetPort.toIntOrNull() ?: 25565,
                     minecraft = if (enableMinecraft) MinecraftServiceConfig(
                         enableHostnameRewrite = true,
-                        rewrittenHostname = rewriteHostname.replace("\n", "").replace("\r", "")
+                        rewrittenHostname = rewriteHostname.replace("\n", "").replace("\r", ""),
+                        motdDescription = motdDescription.replace("\n", "").replace("\r", "").ifEmpty { "{DEFAULT_MOTD}" }
                     ) else null
                 ))
             }) {
@@ -401,6 +414,7 @@ fun OutboundEditDialog(
     var targetPort by remember { mutableStateOf(outbound.targetPort.toString()) }
     var enableMinecraft by remember { mutableStateOf(outbound.minecraft != null) }
     var rewriteHostname by remember { mutableStateOf(outbound.minecraft?.rewrittenHostname ?: "mc.hypixel.net") }
+    var motdDescription by remember { mutableStateOf(outbound.minecraft?.motdDescription ?: "") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -452,6 +466,16 @@ fun OutboundEditDialog(
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
+                    OutlinedTextField(
+                        value = motdDescription,
+                        onValueChange = { motdDescription = it.replace("\n", "").replace("\r", "") },
+                        label = { Text(stringResource(R.string.svc_motd_description)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        supportingText = {
+                            Text(stringResource(R.string.svc_motd_hint), fontSize = 11.sp)
+                        },
+                        singleLine = true
+                    )
                 }
             }
         },
@@ -463,7 +487,8 @@ fun OutboundEditDialog(
                     targetPort = targetPort.toIntOrNull() ?: 25565,
                     minecraft = if (enableMinecraft) MinecraftServiceConfig(
                         enableHostnameRewrite = true,
-                        rewrittenHostname = rewriteHostname.replace("\n", "").replace("\r", "")
+                        rewrittenHostname = rewriteHostname.replace("\n", "").replace("\r", ""),
+                        motdDescription = motdDescription.replace("\n", "").replace("\r", "").ifEmpty { "{DEFAULT_MOTD}" }
                     ) else null
                 ))
             }) {
