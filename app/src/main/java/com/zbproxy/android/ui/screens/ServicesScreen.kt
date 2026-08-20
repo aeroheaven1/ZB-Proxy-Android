@@ -291,7 +291,6 @@ fun ServiceEditDialog(
     var targetPort by remember { mutableStateOf(service.targetPort.toString()) }
     var enableMinecraft by remember { mutableStateOf(service.minecraft != null) }
     var rewriteHostname by remember { mutableStateOf(service.minecraft?.rewrittenHostname ?: "mc.hypixel.net") }
-    val context = LocalContext.current
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -391,7 +390,6 @@ fun OutboundEditDialog(
     var targetPort by remember { mutableStateOf(outbound.targetPort.toString()) }
     var enableMinecraft by remember { mutableStateOf(outbound.minecraft != null) }
     var rewriteHostname by remember { mutableStateOf(outbound.minecraft?.rewrittenHostname ?: "mc.hypixel.net") }
-    val context = LocalContext.current
 
     AlertDialog(
         onDismissRequest = onDismiss,
