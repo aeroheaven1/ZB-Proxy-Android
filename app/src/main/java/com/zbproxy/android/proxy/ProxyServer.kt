@@ -31,7 +31,7 @@ class ProxyServer private constructor(
     private val configManager: ConfigManager,
     private val logCollector: LogCollector
 ) {
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private var scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val isRunning = AtomicBoolean(false)
     private val serverSockets = ConcurrentHashMap<String, ServerSocket>()
     private val activeConnections = ConcurrentHashMap<String, TcpRelay>()
@@ -45,6 +45,8 @@ class ProxyServer private constructor(
 
     suspend fun start() {
         if (isRunning.compareAndSet(false, true)) {
+            // Recreate scope so the server can be restarted after stop()
+            scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
             logCollector.info("Proxy", "Starting ZBProxy server...")
             val config = configManager.config.value
 

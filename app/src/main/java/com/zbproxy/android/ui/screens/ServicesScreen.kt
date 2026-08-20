@@ -284,6 +284,7 @@ fun ServiceEditDialog(
     onDismiss: () -> Unit,
     onSave: (ServiceConfig) -> Unit
 ) {
+    val context = LocalContext.current
     var name by remember { mutableStateOf(service.name) }
     var listen by remember { mutableStateOf(service.listen.toString()) }
     var targetAddress by remember { mutableStateOf(service.targetAddress) }
@@ -294,7 +295,11 @@ fun ServiceEditDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (service.name == context.getString(R.string.svc_new_service)) stringResource(R.string.svc_add_service_title) else stringResource(R.string.svc_edit_service)) },
+        title = {
+            Text(if (service.name == context.getString(R.string.svc_new_service))
+                stringResource(R.string.svc_add_service_title)
+            else stringResource(R.string.svc_edit_service))
+        },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(
@@ -380,6 +385,7 @@ fun OutboundEditDialog(
     onDismiss: () -> Unit,
     onSave: (OutboundConfig) -> Unit
 ) {
+    val context = LocalContext.current
     var name by remember { mutableStateOf(outbound.name) }
     var targetAddress by remember { mutableStateOf(outbound.targetAddress) }
     var targetPort by remember { mutableStateOf(outbound.targetPort.toString()) }
@@ -389,7 +395,11 @@ fun OutboundEditDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (outbound.name == context.getString(R.string.svc_new_outbound)) stringResource(R.string.svc_add_outbound_title) else stringResource(R.string.svc_edit_outbound)) },
+        title = {
+            Text(if (outbound.name == context.getString(R.string.svc_new_outbound))
+                stringResource(R.string.svc_add_outbound_title)
+            else stringResource(R.string.svc_edit_outbound))
+        },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(

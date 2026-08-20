@@ -63,7 +63,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        proxyServer.destroy()
+        // Do NOT call proxyServer.destroy() here — the singleton is shared
+        // with the foreground service; destroying it would kill a running proxy.
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
